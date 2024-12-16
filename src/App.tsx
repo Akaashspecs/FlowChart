@@ -2,6 +2,7 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ReactTabulator } from "react-tabulator";
+import { toast } from "react-toastify";
 import "tabulator-tables/dist/css/tabulator.min.css";
 import Addtask from "./Addtask";
 import DeleteScreen from "./DeleteScreen";
@@ -30,20 +31,36 @@ function App() {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchText = searchParams.get("search") || "";
   const selectedOption = searchParams.get("filter") || "";
+  const [counter, setCounter] = useState<{ num: number; status: string }[]>([]);
   // Array of options
   const options = ["To Do", "In Progress", "Done"];
-
-  console.log(editTask);
 
   useEffect(() => {
     if (savedTodoList) {
       const todoList: Todo = JSON.parse(savedTodoList);
       setTodoList(todoList);
+      const statusCounts = [
+        {
+          status: "To Do",
+          num: todoList.filter((todo) => todo.completed === "To Do").length,
+        },
+        {
+          status: "In Progress",
+          num: todoList.filter((todo) => todo.completed === "In Progress")
+            .length,
+        },
+        {
+          status: "Done",
+          num: todoList.filter((todo) => todo.completed === "Done").length,
+        },
+      ];
+      setCounter(statusCounts);
     }
   }, [savedTodoList]);
 
   useEffect(() => {
     if (
+      selectedOption.length === 0 &&
       searchText &&
       searchText !== "" &&
       savedTodoList &&
@@ -57,9 +74,49 @@ function App() {
     } else {
       setFilterTodoList(null);
     }
-  }, [searchText]);
+  }, [searchText, selectedOption]);
 
-  console.log("242423223423423423423", fliterTodoList);
+  useEffect(() => {
+    if (
+      searchText.length === 0 &&
+      selectedOption &&
+      savedTodoList &&
+      savedTodoList.length > 0
+    ) {
+      if (selectedOption !== "clear") {
+        const todoList: Todo = JSON.parse(savedTodoList);
+        const filterValue = todoList.filter(
+          (item) => item.completed === selectedOption
+        );
+        setFilterTodoList(filterValue);
+      }
+      if (selectedOption === "clear") {
+        setFilterTodoList(null);
+      }
+    }
+  }, [selectedOption, searchText]);
+
+  useEffect(() => {
+    if (
+      selectedOption.length !== 0 &&
+      searchText.length !== 0 &&
+      savedTodoList &&
+      savedTodoList.length > 0
+    ) {
+      if (selectedOption !== "clear") {
+        const todoList: Todo = JSON.parse(savedTodoList);
+        const optionFilterValue = todoList.filter(
+          (item) => item.completed === selectedOption
+        );
+
+        const filtered = optionFilterValue.filter((todo) =>
+          todo.title.toLowerCase().includes(searchText)
+        );
+
+        setFilterTodoList(filtered);
+      }
+    }
+  }, [selectedOption, searchText]);
 
   const columns = [
     { title: "ID", field: "id", width: 10 },
@@ -135,14 +192,6 @@ function App() {
 
       return newParams;
     });
-
-    if (value !== "clear") {
-      const filterValue = todoList.filter((item) => item.completed === value);
-      setFilterTodoList(filterValue);
-    }
-    if (value === "clear") {
-      setFilterTodoList(null);
-    }
   };
 
   const handleEdit = (rowData: Todo[number]) => {
@@ -161,6 +210,7 @@ function App() {
 
     localStorage.setItem("todoList", JSON.stringify(listAfterDeleteTask));
     setIsDeleteScreenVisible(false);
+    toast.success("Task Deleted Successfully");
   };
 
   const handleAddTodo = (newTodo: Todo) => {
@@ -171,6 +221,7 @@ function App() {
     if (savedTodoList) {
       // If there's already a todo list in localStorage, parse it
       updatedTodoList = JSON.parse(savedTodoList);
+      toast.success("Task Added Sucessfully");
     }
 
     // Append the new Todo to the list
@@ -189,6 +240,7 @@ function App() {
         item.id === updatedTodo.id ? updatedTodo : item
       );
       localStorage.setItem("todoList", JSON.stringify(editedTodoList));
+      toast.success("Task Edited Sucessfully");
     }
 
     setTodoList((prevList) =>
@@ -218,8 +270,6 @@ function App() {
     }
   }, []);
 
-  console.log(todoList);
-
   return (
     <div className="h-full">
       <Addtask
@@ -244,7 +294,7 @@ function App() {
           handleDelete={handleDelete}
         />
       )}
-      <div className="w-full flex justify-end bg-gradient-to-r from-cyan-500 to-blue-500 py-5 px-3">
+      <div className="w-full flex justify-center md:justify-end bg-gradient-to-r from-cyan-500 to-blue-500 py-5 px-3">
         <div
           onClick={() => setIsFormVisible(true)}
           className="bg-gradient-to-r from-red-400 to-red-500 px-3 py-2 rounded-md"
@@ -252,17 +302,34 @@ function App() {
           + Add Task
         </div>
       </div>
-
+      <div className="w-full flex justify-center mt-5">
+        <div className="w-fit flex items-center flex-col rounded-lg border overflow-hidden">
+          <div className="w-full bg-gradient-to-r text-[20px] from-red-300 to-red-400 text-center py-2">
+            Counter
+          </div>
+          <div className="flex ">
+            {counter &&
+              counter.map((item) => (
+                <div className="px-4">
+                  <div className="text-center">{item.status}</div>{" "}
+                  <div className="text-center">{item.num}</div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
       <div className="flex justify-center">
-        <div className="max-w-[740px] px-5 mt-[50px]">
-          <div className="flex justify-between ">
+        <div className=" mx-5 mt-[50px] overflow-x-scroll">
+          <div className="flex flex-wrap flex-col-reverse gap-4 sm:gap-0 items-center sm:flex-row justify-between ">
             <div>
-              <div className="text-[12px]">Filter</div>
+              <div className="text-[12px] text-center sm:text-start">
+                Filter
+              </div>
               <select
                 id="status"
                 value={selectedOption}
                 onChange={handleChange}
-                className="w-[330px] px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-[230px] sm:w-[330px] px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="" disabled>
                   Please select a status
@@ -277,7 +344,9 @@ function App() {
               </select>
             </div>
             <div>
-              <div className="text-[12px]">Search</div>
+              <div className="text-[12px] text-center  sm:text-start">
+                Search
+              </div>
               <input
                 type="text"
                 placeholder="Search tasks..."
@@ -287,10 +356,10 @@ function App() {
               />
             </div>
           </div>
-          <div className=" mt-[20px] ">
+          <div className=" mt-[20px]  ">
             {todoList.length > 0 && (
               <ReactTabulator
-                className="bg-red-500 "
+                className=" h-[500px]"
                 data={fliterTodoList ? fliterTodoList : todoList}
                 columns={columns}
                 layout={"fitDataTable"}

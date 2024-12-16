@@ -42,11 +42,6 @@ const EditFormScreen: React.FC<Props> = ({
   });
 
   const handleSubmit = (values: FormValues) => {
-    // // alert("Form Submitted!");
-    // setNum((e) => {
-    //   console.log("66666", e);
-    //   return 2;
-    // });
     if (values && editTask) {
       const newTodo: TodoObject = {
         id: editTask?.id, // Generate a unique ID based on the current list length

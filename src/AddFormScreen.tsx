@@ -20,6 +20,7 @@ const AddFormScreen: React.FC<Props> = ({ setTodoList, todoListLength }) => {
     description: "",
     completed: "",
   };
+  const savedTodoList = localStorage.getItem("todoList");
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -36,11 +37,14 @@ const AddFormScreen: React.FC<Props> = ({ setTodoList, todoListLength }) => {
   });
 
   const handleSubmit = (values: FormValues) => {
-    if (values) {
-      // const savedTodoList: Todo = localStorage.getItem("todoList");
+    if (values && savedTodoList) {
+      const todoList: Todo = JSON.parse(savedTodoList);
+
       const newTodo: Todo = [
         {
-          id: todoListLength + 1, // Generate a unique ID based on the current list length
+          id: todoList
+            ? todoList[todoList.length - 1].id + 1
+            : todoListLength + 1, // Generate a unique ID based on the current list length
           title: values.title,
           description: values.description || "-",
           completed: values.completed || "To Do",

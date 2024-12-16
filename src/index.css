@@ -36,3 +36,19 @@
   /* background-color: #ffeb3b; */
   /* Highlight cell on hover */
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Edge */
+}
+
+::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+  height: 8px; /* Height of the scrollbar for horizontal scrolling */
+  background-color: white;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #adadad; /* Thumb color */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+  border: 2px solid #f3f3f3; /* Optional border for better visibility */
+}

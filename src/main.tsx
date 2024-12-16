@@ -9,7 +9,7 @@ import "./index.css";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <ToastContainer />
+      <ToastContainer autoClose={1500} />
       <App />
     </BrowserRouter>
   </StrictMode>
