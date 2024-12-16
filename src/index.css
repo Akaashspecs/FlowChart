@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.tabulator .tabulator-header,
+.tabulator .tabulator-row,
+.tabulator .tabulator-cell {
+  border: none !important;
+}
+
+.tabulator {
+  max-width: 100%;
+  overflow-x: auto;
+  border-radius: 10px;
+}
+
+.tabulator-row {
+  word-break: break-word; /* Prevent text overflow */
+}
+
+.tabulator-row:hover {
+  color: #ffffff;
+
+  /* Change hover background */
+}
+
+.tabulator-cell {
+  color: #333; /* Change cell text color */
+  font-size: 14px;
+  text-align: center;
+  background-color: #ffffff;
+  height: 40px;
+}
+
+.tabulator-cell:hover {
+  /* background-color: #ffeb3b; */
+  /* Highlight cell on hover */
+}
