@@ -29,7 +29,7 @@ function App() {
   const savedTodoList = localStorage.getItem("todoList");
   const [searchParams, setSearchParams] = useSearchParams();
   const searchText = searchParams.get("search") || "";
-  const selectedOption = searchParams.get("filter") || "";
+  const selectedOption = searchParams.get("filters") || "";
   // Array of options
   const options = ["To Do", "In Progress", "Done"];
 
