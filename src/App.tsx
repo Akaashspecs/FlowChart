@@ -1,7 +1,5 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import ReactDOM from "react-dom"; // Add this import
-import { FaRegEdit, FaTrash } from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
 import { ReactTabulator } from "react-tabulator";
 import "tabulator-tables/dist/css/tabulator.min.css";
@@ -71,49 +69,36 @@ function App() {
       title: "Status",
       field: "completed",
       width: 150,
-      formatter: (cell) => {
+      formatter: (cell: any) => {
         const value = cell.getValue(); // Get the status value
         const color =
           value === "Done"
             ? "rgba(11, 204, 8, 0.8)"
             : value === "In Progress"
             ? "orange"
-            : "rgba(255, 0, 0, 0.6);"; // Set color based on status
-        return `<span style="background-color: ${color}; font-weight: bold; width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 3px; padding-bottom: 3px; border-radius: 10px">${value}</span>`;
+            : "rgba(255, 0, 0, 0.6)";
+        return `<span style="background-color: ${color}; font-weight: bold; width: 100%; padding: 3px 10px; border-radius: 10px;">${value}</span>`;
       },
     },
     {
-      title: "Edit",
-      field: "edit",
+      title: "Actions",
+      field: "actions",
       width: 150,
-      formatter: (cell, formatterParams, onRendered) => {
-        const container = document.createElement("div");
-        ReactDOM.render(
-          <div className="flex gap-3 justify-center">
-            <FaRegEdit
-              style={{
-                cursor: "pointer",
-                color: "#007bff",
-                marginRight: "10px",
-              }}
-              onClick={() => handleEdit(cell.getData())}
-            />
-            <FaTrash
-              style={{ cursor: "pointer", color: "red" }}
-              onClick={() => handleDeleteScreen(cell.getData())}
-            />
-          </div>,
-          container
-        );
-        return container;
+      formatter: () => {
+        // Return an HTML string for the buttons
+        return `
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <i class="fa fa-edit" style="cursor: pointer; color: #007bff;" data-action="edit">Edit</i>
+            <i class="fa fa-trash" style="cursor: pointer; color: red;" data-action="delete"> Delete</i>
+          </div>`;
       },
-      // <button class="delete-btn">Delete</button>
-      cellClick: (e, cell) => {
-        // Handle clicks on specific buttons
+      cellClick: (e: UIEvent, cell: any) => {
+        const action = (e.target as HTMLElement).dataset.action;
         const rowData = cell.getData();
-        if (e.target.classList.contains("edit-btn")) {
+
+        if (action === "edit") {
           handleEdit(rowData);
-        } else if (e.target.classList.contains("delete-btn")) {
+        } else if (action === "delete") {
           handleDeleteScreen(rowData);
         }
       },
@@ -310,9 +295,9 @@ function App() {
                 columns={columns}
                 layout={"fitDataTable"}
                 responsiveLayout={"collapse"} // Enables responsive layout
-                responsiveLayoutCollapseFormatter={(data) => {
+                responsiveLayoutCollapseFormatter={(data: any) => {
                   return data
-                    .map((d) => `<div>${d.title}: ${d.value}</div>`)
+                    .map((d: any) => `<div>${d.title}: ${d.value}</div>`)
                     .join(""); // Custom display for collapsed data
                 }}
               />

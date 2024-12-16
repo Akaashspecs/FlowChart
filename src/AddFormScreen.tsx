@@ -37,7 +37,7 @@ const AddFormScreen: React.FC<Props> = ({ setTodoList, todoListLength }) => {
 
   const handleSubmit = (values: FormValues) => {
     if (values) {
-      const savedTodoList = localStorage.getItem("todoList");
+      // const savedTodoList: Todo = localStorage.getItem("todoList");
       const newTodo: Todo = [
         {
           id: todoListLength + 1, // Generate a unique ID based on the current list length
